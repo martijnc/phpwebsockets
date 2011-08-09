@@ -2,8 +2,8 @@ PHP WebSockets
 ==============
 PHP WebSockets is a PHP library that implements the latest version of
 the WebSockets protocol. The [WebSockets protocol](http://tools.ietf.org/html/draft-ietf-hybi-thewebsocketprotocol-10) is currently being
-standardized by the IETF. With WebSockets a client (e.g a browser) and
-a server set up a two-way communcation channel with little overhead
+standardized by the IETF. With WebSockets, a client (e.g.: a browser) and
+a server can set up a two-way communication channel with little overhead
 compared to a XMLHttpRequest or long polling.
 
 The current version of this library doesn't has a `WebSocketClient` yet.
