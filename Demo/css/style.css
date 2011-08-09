@@ -1,0 +1,21 @@
+body { font-family: Arial, Helvetica, sans-serif; background-color: #ececec; color: #a2332c; margin: 15px; }
+
+a, a:visited { color: #3e3e3e; border-bottom: 1px dashed #3e3e3e; text-decoration: none; padding-bottom: 2px;}
+a:hover, a:focus { border-bottom: 2px dashed #3e3e3e; }
+
+#userlist { color: #3e3e3e; float: right; width: 150px; border: solid 1px #980c10; border-bottom-left-radius: .5em; border-top-left-radius: .5em; background-color: #fff; min-height: 200px; max-height: 400px; overflow-y: scroll; overflow-x: hidden; margin: 0; padding: 0; }
+#userlist li { list-style: none; margin: 5px 10px; }
+#chat-window { float: left; overflow-y: scroll; word-wrap: normal; padding: 5px; vertical-align: text-bottom; width: 690px; height: 400px; border: solid 1px #980c10; border-bottom-left-radius: .5em; border-top-left-radius: .5em; background-color: #fff; }
+
+.description { color: #3e3e3e; width: 700px; }
+.chat-container { width: 870px; overflow: auto; }
+.notice { margin: 0; padding: 0; }
+.message { margin: 0; padding: 0; color: #000; }
+.control { width: 700px; padding-top: 3px; clear: both; overflow: auto; }
+.control input { float: left; outline: none; width: 595px; border-radius: .5em; border: solid 1px #980c10; font-size: 14px; padding: 3px; margin-top: 2px; }
+
+/* Button: http://webdesignerwall.com/tutorials/css3-gradient-buttons */
+.button { margin-top: 1px; float: right; display: inline-block; outline: none; cursor: pointer; text-align: center; text-decoration: none; font: 14px/100% Arial, Helvetica, sans-serif; padding: .4em 2em; text-shadow: 0 1px 1px rgba(0,0,0,.3); border-radius: .5em; box-shadow: 0 1px 2px rgba(0,0,0,.2); color: #d9eef7; border: solid 1px #980c10; background: #d81b21; background: -webkit-gradient(linear, left top, left bottom, from(#ed1c24), to(#aa1317)); background: -moz-linear-gradient(top,  #ed1c24,  #aa1317); filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#ed1c24', endColorstr='#aa1317'); }
+.button:hover { text-decoration: none; background: #b61318; background: -webkit-gradient(linear, left top, left bottom, from(#c9151b), to(#a11115)); background: -moz-linear-gradient(top,  #c9151b,  #a11115); filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#c9151b', endColorstr='#a11115'); }
+.button:active { position: relative; top: 1px; color: #de898c; background: -webkit-gradient(linear, left top, left bottom, from(#aa1317), to(#ed1c24)); background: -moz-linear-gradient(top,  #aa1317,  #ed1c24); filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#aa1317', endColorstr='#ed1c24'); }
+footer p { margin-top: 20px; clear: both; font-size: 12px; color: #3e3e3e; }

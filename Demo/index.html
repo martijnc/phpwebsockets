@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8" />
+  <title>PHP WebSockets - Server demo</title>
+  <link rel="stylesheet" href="css/style.css?1" media="all" />
+</head>
+<body>
+  <a href="https://github.com/Martijnc" target="_blank"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://a248.e.akamai.net/assets.github.com/img/e6bef7a091f5f3138b8cd40bc3e114258dd68ddf/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67" alt="Fork me on GitHub"></a>
+  <h1>PHP WebSocket server demo</h1>
+  <p class="description">A PHP library implementing the lastest version of the WebSockets protocol.</p>
+  <section>
+    <div class="chat-container">
+      <div id="chat-window"></div>
+      <ul id="userlist"><li>Not connected</li></ul>
+    </div>
+    <div class="control">
+      <input id="message" placeholder="Enter your message here...">
+      <div id="submit" class="button">Send</div>
+    </div>
+  </section>
+  <footer>
+    <p>A project by <a href="http://www.martijnc.be" target="_blank">Martijn Croonen</a> &mdash; <a href="https://github.com/Martijnc" target="_blank">Contribute on GitHub</a> &mdash; <a href="https://twitter.com/#!/Martijnc_" target="_blank">Martijn on Twitter</a></p>
+  </footer>
+  <script src="js/chatserver.js?1"></script>
+  <script type="text/javascript">
+      /* Create a new chatserver client */
+      var chatServer = new ChatServer('ws://dev.martijnc.be:8081', document.getElementById('chat-window'),
+                                      document.getElementById('userlist'));
+      
+      /* Connect to the server */
+      chatServer.connect();
+     
+      /* Method used to handle userevents */
+      function processCommand()
+      {
+          /* The inputfield in which messages and command are typed by the user */
+          var inputField = document.getElementById('message');
+          
+          /* The value or content of the textfield */
+          var fieldValue = inputField.value;
+          
+          /* Check whether it is a normal message or a nickchange command */
+          if (fieldValue.substring(0, 5).toLowerCase() == '/nick')
+          {
+              chatServer.changeNick(fieldValue.substring(6));
+          }
+          else
+          {
+              chatServer.postMessage(fieldValue);
+          }
+
+          /* Clear the inputfield again for the next message */
+          inputField.value = '';
+      }
+
+
+      /* Hook to the correct events. */
+      document.getElementById('submit').onclick = processCommand;
+      document.getElementById('message').onkeypress = function(e) {
+          /* Only submit when enter is pressed in the input field */
+          if(e.keyCode == 13)
+          {
+              processCommand();   
+          }
+      }
+      
+      
+      /* Google Analytics... */
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-13006530-2']);
+      _gaq.push(['_trackPageview']);
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+  </script>
+</body>
+</html>
