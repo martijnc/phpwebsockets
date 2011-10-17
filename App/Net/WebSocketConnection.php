@@ -369,7 +369,7 @@ class WebSocketConnection extends Socket
         /**
          * The Sec-WebSocket-Version is a non-optional part of the opening handshake and should
          * have the value 8. We don't support older versions of the protocol */
-        if ($this -> getHeader('Sec-WebSocket-Version') != '8') {
+        if ($this -> getHeader('Sec-WebSocket-Version') != '13') {
             $this -> write('HTTP/1.1 400 Bad Request' . "\r\n\r\n");
             $this -> close(1002);
             return false;
