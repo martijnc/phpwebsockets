@@ -129,12 +129,22 @@ class WebSocketFrame implements Frameable
     
     /**
      * The maximum length for frames defined by the protocol is the maximum value
-     * of a 64 bit unsigned integer. The protocol doesn't define a minimum length.
-     * For convience we use the PHP_INT_MAX value by default.
+     * of a 64 bit unsigned integer (so 2^63). The protocol doesn't define a minimum length.
+     * For convience we use the PHP_INT_MAX value by default. This value is only used while
+     * sending frames
      *
-     * @var int $m_nMaxLength The maximum length for frames
+     * @var int $m_nMaxLengthOut The maximum length for outgoing frames
      */
-    protected static $m_nMaxLength    = PHP_INT_MAX;
+    protected static $m_nMaxLengthOut    = PHP_INT_MAX;
+    
+    /**
+     * The maximum length for frames defined by the protocol is the maximum value
+     * of a 64 bit unsigned integer (so 2^63). The protocol doesn't define a minimum length.
+     * When we recieve a frame larger than this value the connection will be closed.
+     *
+     * @var int $m_nMaxLengthOut The maximum length for incoming frames
+     */
+    protected static $m_nMaxLengthIn    = PHP_INT_MAX;
     
     /**
      * It possible to read frames in smaller parts as they are received by
@@ -249,8 +259,8 @@ class WebSocketFrame implements Frameable
             $this -> m_bLengthRead = true;
         }
         
-        /* If the payloadlength is larger then then PHP_INT_MAX we can't process it properly */
-        if ($this -> m_nPayLoadLength > PHP_INT_MAX)
+        /* If the payloadlength is larger then WebSocketFrame :: m_nMaxLengthIn we can't process it properly */
+        if ($this -> m_nPayLoadLength > static :: $m_nMaxLengthIn)
         {
             return false;
         }
@@ -502,7 +512,7 @@ class WebSocketFrame implements Frameable
      */
     public function setData(array $aData)
     {
-        if (self :: $m_nMaxLength < count($aData))
+        if (self :: $m_nMaxLengthOut < count($aData))
         {
             /* Exceeding maximum frame length */
             return false;
@@ -592,7 +602,7 @@ class WebSocketFrame implements Frameable
      */
     public static function getMaxLength()
     {
-        return static :: $m_nMaxLength;
+        return static :: $m_nMaxLengthOut;
     }
     
     /**
@@ -603,7 +613,7 @@ class WebSocketFrame implements Frameable
      */
     public static function setMaxLength($nMaxLength)
     {
-        static :: $m_nMaxLength = $nMaxLength;
+        static :: $m_nMaxLengthOut = $nMaxLength;
     }
     
     /**

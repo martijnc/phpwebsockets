@@ -571,10 +571,10 @@ class WebSocketConnection extends Socket
         /* if there is a WebSocketFrame */
         if ($this -> m_pCurrentFrame != null) {
         
-            /* Start reading, if this method returns something other then 1004, the frame is
+            /* Start reading, if this method returns something other then true, the frame is
              * to large and cannot be read */
             if (($Result = $this -> m_pCurrentFrame -> read($this)) !== true) {
-                $this -> disconnect(1004, 'Frame too large.');
+                $this -> disconnect(1009, 'Frame too large.');
             }
 
             /* When the frame is fully read, start processing it.
