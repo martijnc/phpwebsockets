@@ -137,7 +137,7 @@ class WebSocketServer extends Socket
             $aRemoteHost = explode(':', stream_socket_get_name($rConnection, true));
 
             /* Check if a connection from this IP is already in the CONNECTING state */
-            if (isset(WebSocketConnection :: $aInConnectingState[$aRemoteHost[0]]))
+            if (array_key_exists($aRemoteHost[0], WebSocketConnection :: $aInConnectingState))
             {
                 /* Queue it if so */
                 $this -> m_aConnectionQueue[] = array('ip' => $aRemoteHost[0], 'conn' => $rConnection);
@@ -155,7 +155,7 @@ class WebSocketServer extends Socket
             foreach ($this -> m_aConnectionQueue as $sKey => &$aConnection)
             {
                 /* If the previous connection from this client is no longer CONNECTING */
-                if (!isset(WebSocketConnection :: $aInConnectingState[$aConnection['ip']]))
+                if (!array_key_exists($aConnection['ip'], WebSocketConnection :: $aInConnectingState))
                 {
                     $rConnection = $aConnection['conn'];
                     WebSocketConnection :: $aInConnectingState[$aConnection['ip']] = true;
