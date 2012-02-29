@@ -39,7 +39,7 @@ class WebSocketServer extends Socket
      *
      * @var array Array containing all observers
      */
-    protected $m_aObservers      = array();
+    protected $m_aObservers             = array();
     
     /**
      * A WebSocketServer and WebSocketClient can negotiate a subprotocol that will
@@ -49,7 +49,16 @@ class WebSocketServer extends Socket
      *
      * @var array All subprotocols the server wishes to speak
      */
-    protected $m_aProtocols      = array();
+    protected $m_aProtocols             = array();
+    
+    /**
+     * The spec limits the number of connection from the same host that can be 
+     * in the CONNECTING state to 1. This array is a reference to the array
+     * containing all connections in the CONNECTING state so we can keep track of this
+     *
+     * @var array reference to the array containing all connections in the CONNECTION state
+     */
+    protected $m_aConnectionQueue       = array();
 
     /**
      * Constructor for the WebSocketServer class
@@ -113,15 +122,57 @@ class WebSocketServer extends Socket
 
     
     /**
-     * 
+     * Accept incoming client connections
      *
      * @return boolean True if a new connection has been accepted succesfully
      */
     public function accept() {
     
+        $rConnection = null;
+    
         /* Use parent :: accept to accept incoming connections */
         if ($rConnection = @stream_socket_accept($this -> m_rSocket, 0))
         {
+            /* Get the remote hosts host en port information and split them */
+            $aRemoteHost = explode(':', stream_socket_get_name($rConnection, true));
+
+            /* Check if a connection from this IP is already in the CONNECTING state */
+            if (isset(WebSocketConnection :: $aInConnectingState[$aRemoteHost[0]]))
+            {
+                /* Queue it if so */
+                $this -> m_aConnectionQueue[] = array('ip' => $aRemoteHost[0], 'conn' => $rConnection);
+                $rConnection = null;
+            }
+            else
+            {
+                /* Or handle it otherwise */
+                WebSocketConnection :: $aInConnectingState[$aRemoteHost[0]] = true;
+            }
+        }
+        else
+        {
+            /* If no new connection are accepted, see if we can handshake with on old one */
+            foreach ($this -> m_aConnectionQueue as $sKey => &$aConnection)
+            {
+                /* If the previous connection from this client is no longer CONNECTING */
+                if (!isset(WebSocketConnection :: $aInConnectingState[$aConnection['ip']]))
+                {
+                    $rConnection = $aConnection['conn'];
+                    WebSocketConnection :: $aInConnectingState[$aConnection['ip']] = true;
+                    
+                    /* Remove from queue */
+                    unset($this -> m_aConnectionQueue[$sKey]);
+                    
+                    break;
+                }
+            }
+            
+            /* Unset foreach reference */
+            unset($aConnection);
+        }
+         
+         if ($rConnection && $rConnection !== null)
+         {
             /* If the server is using TLS, enable it on the new socket */
             if ($this -> m_bSecure)
             {
@@ -136,7 +187,7 @@ class WebSocketServer extends Socket
                 return false;
             }
 
-            /* Use the socket and wrap it in a nice new WebSocketConnection object */
+            /* Take the socket and wrap it in a nice new WebSocketConnection object */
             $pNewConnection = new WebSocketConnection($rConnection, $this -> m_aProtocols);
             
             /* Put the socket in non-blocking mode so we can run multiple sockets in the

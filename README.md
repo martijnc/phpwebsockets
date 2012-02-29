@@ -6,8 +6,6 @@ standardized by the IETF. With WebSockets, a client (e.g.: a browser) and
 a server can set up a two-way communication channel with little overhead
 compared to a XMLHttpRequest or long polling.
 
-The current version of this library doesn't has a `WebSocketClient` yet.
-
 Usage
 -----
 The demo can be started by starting the `Demo/run.php` file from the command-

@@ -36,10 +36,10 @@ class WebSocketConnection extends Socket
 {
     
     /* Class contants used to identify the WebSocket connection state */
-    const STATE_NEW                     = 0;
-    const STATE_OPEN                    = 1;
-    const STATE_CLOSING                 = 2;
-    const STATE_CLOSED                  = 3;
+    const STATE_NEW                          = 0;
+    const STATE_OPEN                         = 1;
+    const STATE_CLOSING                      = 2;
+    const STATE_CLOSED                       = 3;
     
     /**
      * A WebSockets opening handshake is HTTP compatible GET request that
@@ -47,7 +47,7 @@ class WebSocketConnection extends Socket
      *
      * @var string The resource that was requested
      */
-    protected $m_sRequestedResource     = '';
+    protected $m_sRequestedResource          = '';
     
     /**
      * A WebSocketClient and WebSocketServer can negotiate a subprotocol to
@@ -57,7 +57,7 @@ class WebSocketConnection extends Socket
      *
      * @var array An array of allowed subprotocols.
      */
-    protected $m_aRequestProtocols      = array();
+    protected $m_aRequestProtocols           = array();
     
     /**
      * A WebSocketClient and WebSocketServer can negotiate the subprotocol to
@@ -67,7 +67,7 @@ class WebSocketConnection extends Socket
      *
      * @var array Array containing allowed subprotocols.
      */
-    protected $m_aAllowedProtocols      = array();
+    protected $m_aAllowedProtocols           = array();
     
     /**
      * A WebSocketClient and WebSocketServer can negotiate a subprotocol to
@@ -76,7 +76,7 @@ class WebSocketConnection extends Socket
      *
      * @var string The protocol that was selected during the opening handshake
      */
-    protected $m_sSelectedProtocol      = null;
+    protected $m_sSelectedProtocol           = null;
     
     /**
      * The WebSocketServer uses an observer pattern to inform other objects
@@ -85,7 +85,7 @@ class WebSocketConnection extends Socket
      *
      * @var array Array containing all observers
      */
-    protected $m_aObservers             = array();
+    protected $m_aObservers                  = array();
     
     /**
      * This array will contain the headers that were sent by the client during
@@ -93,7 +93,7 @@ class WebSocketConnection extends Socket
      *
      * @var array The headers that were send by the client
      */
-    protected $m_aHeaders               = array();
+    protected $m_aHeaders                    = array();
     
     /**
      * The opening handshake can contain cookie information. This information will be
@@ -101,7 +101,7 @@ class WebSocketConnection extends Socket
      *
      * @var array Associative array containing cookie information
      */
-    protected $m_aCookies               = array();
+    protected $m_aCookies                    = array();
     
     /**
      * The server can send cookies in the opening handshake that should be
@@ -110,7 +110,7 @@ class WebSocketConnection extends Socket
      *
      * @var array An array containing HttpCookie objects
      */
-    protected $m_aSetCookies            = array();
+    protected $m_aSetCookies                 = array();
     
     /**
      * Messages can be broken into smaller pieces called frames.
@@ -120,7 +120,7 @@ class WebSocketConnection extends Socket
      *
      * @var array The buffered data that has already been read
      */
-    protected $m_aFragmentBuffer        = array();
+    protected $m_aFragmentBuffer             = array();
     
     /**
      * The non-blocking socket will store all data it reads in this array
@@ -128,18 +128,18 @@ class WebSocketConnection extends Socket
      *
      * @var array The read buffer. Contains raw stream data.
      */
-    protected $m_aReadBuffer            = array();
+    protected $m_aReadBuffer                 = array();
     
     /**
      * @var WebSocketFrame The frame that is currently being read.
      */
-    protected $m_pCurrentFrame          = null;
+    protected $m_pCurrentFrame               = null;
     
     /**
      * @var int The message type of the message that is currently being read
      *          from this connection.
      */
-    protected $m_nCurrentMessageType    = -1;
+    protected $m_nCurrentMessageType         = -1;
     
     /**
      * A WebSocketConnection has multiple states. this variable knows what the
@@ -147,17 +147,26 @@ class WebSocketConnection extends Socket
      *
      * @var int The current state of this connection
      */
-    protected $m_nReadyState            = -1;
+    protected $m_nReadyState                 = -1;
+    
+    /**
+     * The spec limits the number of connection from the same host that can be 
+     * in the CONNECTING state to 1. This array containts all connections in the
+     * CONNECTING state so we can keep track of this
+     *
+     * @var array reference to the array containing all connections in the CONNECTION state
+     */
+    public static $aInConnectingState        = array();
     
     /**
      * @var boolean True if the opening handshake from the client has been read
      */
-    protected $m_bReadHandshake         = false;
+    protected $m_bReadHandshake              = false;
     
     /**
      * @var boolean True if the response handshake has been send to the client
      */
-    protected $m_bSendHandshake         = false;
+    protected $m_bSendHandshake              = false;
     
     /**
      * The WebSockets closing handshake is a two part handshake. To handle this
@@ -165,7 +174,7 @@ class WebSocketConnection extends Socket
      *
      * @var boolean True if the client has send its closing handshake
      */
-    protected $m_bRecievedClose         = false;
+    protected $m_bRecievedClose              = false;
     
     /**
      * The WebSockets closing handshake is a two part handshake. To handle this
@@ -173,17 +182,17 @@ class WebSocketConnection extends Socket
      *
      * @var boolean True if we have send a closing control frame
      */
-    protected $m_bSendClose             = false;
+    protected $m_bSendClose                  = false;
     
     /**
      * @var int The numeric code as to why the connection was closed
      */
-    protected $m_nCloseReason           = null;
+    protected $m_nCloseReason                = null;
     
     /**
      * @var string A string with a reason as to why the connection was closed
      */
-    protected $m_sCloseReason           = null;
+    protected $m_sCloseReason                = null;
     
     /**
      * When the server tries to close a WebSocket connection but the client
@@ -194,7 +203,7 @@ class WebSocketConnection extends Socket
      *
      * @var int The time at which the closing handshake was started.
      */
-    protected $m_nCloseStartedAt        = null;
+    protected $m_nCloseStartedAt             = null;
 
     /**
      * The WebSocketConnection constructor. Initializes the connection object and
@@ -208,9 +217,7 @@ class WebSocketConnection extends Socket
         $this -> m_rSocket = $rSocket;
         
         /* Get the remote hosts host en port information and split them */
-        $sRemoteHost = explode(':',
-                                      stream_socket_get_name($this -> m_rSocket, true)
-                              );
+        $sRemoteHost = explode(':', stream_socket_get_name($this -> m_rSocket, true));
         
         /* Call parent contructor and pass the host info */
         parent :: __construct($sRemoteHost[0], $sRemoteHost[1]);
@@ -261,10 +268,16 @@ class WebSocketConnection extends Socket
                      * considered to be open, so update the ready state */
                     $this -> m_nReadyState = static :: STATE_OPEN;
                     
+                    /* This connection is not in CONNECTING state anymore */
+                    unset(static :: $aInConnectingState[$this -> m_sIp]);
+                    
                     /* And yes, the handshake has been read */
                     $this -> m_bSendHandshake = true;
                     $this -> onOpen();
                 } else {
+                    /* This connection is not in CONNECTING state anymore */
+                    unset(static :: $aInConnectingState[$this -> m_sIp]);
+                
                     /* If the handshake was invalid, the connection is closed */
                     $this -> m_nReadyState = static :: STATE_CLOSED;
                 }
@@ -1051,6 +1064,9 @@ class WebSocketConnection extends Socket
         
         /* Raise events */
         $this -> onClose($nReason, $sReason);
+        
+        /* This connection is not in CONNECTING state anymore */
+        unset(static :: $aInConnectingState[$this -> m_sIp]);
         
         /* Call the parent close function to close the TCP connection */
         return parent :: close();
