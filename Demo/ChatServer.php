@@ -37,7 +37,7 @@ class ChatServer implements \App\Net\ServerObserver, \App\Net\ConnectionObserver
     /**
      * @var int We don't want to send pings during every loop
      */
-    protected $m_nPingCounter = 0;
+    protected $m_nPingCounter          = 0;
 
     /**
      * The ChatServer constructor
@@ -48,7 +48,7 @@ class ChatServer implements \App\Net\ServerObserver, \App\Net\ConnectionObserver
     public function __construct($sHost, $nPort)
     {
         /* Create a WebSocketServer instance */
-        $this -> m_pServer = new \App\Net\WebSocketServer('0.0.0.0', 8081, false);
+        $this -> m_pServer = new \App\Net\WebSocketServer('0.0.0.0', 8090, false);
         
         /* Subscribe to events on the server */
         $this -> m_pServer -> subscribe($this);

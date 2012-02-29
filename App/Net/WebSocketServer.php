@@ -18,7 +18,7 @@
 
 namespace App\Net;
 
-require_once __DIR__ . '/SocketServer.php';
+require_once __DIR__ . '/Socket.php';
 require_once __DIR__ . '/ConnectionObserver.php';
 
 /**
@@ -29,7 +29,7 @@ require_once __DIR__ . '/ConnectionObserver.php';
  * port and IP. When creating a secure TLS server their has to be a valid
  * certificate present.
  */
-class WebSocketServer extends SocketServer
+class WebSocketServer extends Socket
 {
 
     /**
@@ -68,20 +68,49 @@ class WebSocketServer extends SocketServer
     }
     
     /**
-     * This method will open the server socket and call the onServerOpen event/method
-     * in all objects that subscribed to this server
+     * The open method opens a server socket that will start listening
+     * for incoming connections on the ip and port passed through
+     * the constructor. Calls the onServerOpen event/method
      *
-     * @return boolean True on succes (server is listening) or false on error
-     */
+     * @return boolean True on succes, false on error
+     */    
     public function open()
     {
-        if ($bResult = parent :: open())
+    
+        $rContext = stream_context_create();
+        
+        /* If the bind IP is valid, bind the socket to it. */
+        if (filter_var($this -> sBindIp, FILTER_VALIDATE_IP) !== false)
         {
-            $this -> onServerOpen();
+            stream_context_set_option ($rContext, 'socket', 'bindto', $this -> sBindIp);
         }
         
-        return $bResult;
+        /* If this is a secure set some ssl paramaters on the socket. */
+        if ($this -> m_bSecure)
+        {
+            /* Make sure this points to the servers certificate. Apache should have permissions to the file.
+             * When your certificate requires a passphrase you should set that as well.
+             */
+            stream_context_set_option($rContext, 'ssl', 'local_cert','/path/to/your_cert.pem');
+            stream_context_set_option($rContext, 'ssl', 'allow_self_signed',true); 
+            stream_context_set_option($rContext, 'ssl', 'verify_peer', false);
+        }
+        
+        /* Open the socket and return the result. */
+        if ((filter_var($this -> m_sIp, FILTER_VALIDATE_IP) !== false) &&
+            $this -> m_rSocket = @stream_socket_server('tcp://' . $this -> m_sIp . ':' . $this -> m_nPort,
+                                                      $nError, $sError, STREAM_SERVER_BIND | STREAM_SERVER_LISTEN,
+                                                      $rContext))
+        {
+            $this -> onServerOpen();
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
+
     
     /**
      * 
@@ -91,7 +120,7 @@ class WebSocketServer extends SocketServer
     public function accept() {
     
         /* Use parent :: accept to accept incoming connections */
-        if ($rConnection = parent::accept())
+        if ($rConnection = @stream_socket_accept($this -> m_rSocket, 0))
         {
             /* If the server is using TLS, enable it on the new socket */
             if ($this -> m_bSecure)
