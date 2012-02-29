@@ -351,10 +351,19 @@ class WebSocketConnection extends Socket
             
             /* There should be two parts... */
             if (count($aParts) == 2) {
-                /* Store them in a array. Header names are case-insensitive. */
-                $this -> m_aHeaders[trim(strtolower($aParts[0]))] = trim($aParts[1]);
+                /* Store them in a array. Header names are case-insensitive.
+                 * Header fields with csv values may be present twice so
+                 * we merge header fields that are present twice because
+                 * we don't know which header fields have csv values and which don't */
+                if (array_key_exists(trim(strtolower($aParts[0])), $this -> m_aHeaders))
+                {
+                    $this -> m_aHeaders[trim(strtolower($aParts[0]))] .= ',' . trim($aParts[1]);
+                }
+                else
+                {
+                    $this -> m_aHeaders[trim(strtolower($aParts[0]))] = trim($aParts[1]);
+                }
             }
-
         }
 
         /* Reset the entire read buffer */
