@@ -405,22 +405,8 @@ class WebSocketConnection extends Socket
         /**
          * The Sec-WebSocket-Version is a non-optional part of the opening handshake and should
          * have a value from $m_aAcceptedVersions. We don't support all versions of the protocol
-         * First build an array of versions accepted by the client*/
-        $aClientVersions = explode(',', $this -> getHeader('Sec-WebSocket-Version'));
-        
-        /* Trim values */
-        array_map('trim', $aClientVersions);
-        
-        /* Get in common values. The protocols that appear first in the $m_aAcceptedVersions array
-         * have the preference. */
-        $aInCommomVersions = array_intersect($this -> m_aAcceptedVersions, $aClientVersions);
-        
-        /* Look for a match */
-        if (count($aInCommomVersions) > 0)
-        {
-            $sProtocolVersion = $aInCommomVersions[0];
-        }
-        else
+         */
+        if (array_key_exists($this -> getHeader('Sec-WebSocket-Version'), $this -> m_aAcceptedVersions))
         {
             /* Close the connection if none is supported and include the accepted versions
             * in the message so the client can retry with on of those. */
