@@ -159,6 +159,20 @@ class WebSocketConnection extends Socket
     public static $aInConnectingState        = array();
     
     /**
+     * The protocol versions that this code is able to handle
+     *
+     * @var array contains protocol versions that this code is able to handle
+     */
+    protected $m_aAcceptedVersions           = array(13);
+    
+    /**
+     * The protocol version in use on this connection
+     *
+     * @var array reference to the array containing all connections in the CONNECTION state
+     */
+    public static $sProtocolVersion         = 0;
+    
+    /**
      * @var boolean True if the opening handshake from the client has been read
      */
     protected $m_bReadHandshake              = false;
@@ -390,10 +404,30 @@ class WebSocketConnection extends Socket
 
         /**
          * The Sec-WebSocket-Version is a non-optional part of the opening handshake and should
-         * have the value 8. We don't support older versions of the protocol */
-        if ($this -> getHeader('Sec-WebSocket-Version') != '13') {
-            $this -> write('HTTP/1.1 400 Bad Request' . "\r\n\r\n");
+         * have a value from $m_aAcceptedVersions. We don't support all versions of the protocol
+         * First build an array of versions accepted by the client*/
+        $aClientVersions = explode(',', $this -> getHeader('Sec-WebSocket-Version'));
+        
+        /* Trim values */
+        array_map('trim', $aClientVersions);
+        
+        /* Get in common values. The protocols that appear first in the $m_aAcceptedVersions array
+         * have the preference. */
+        $aInCommomVersions = array_intersect($this -> m_aAcceptedVersions, $aClientVersions);
+        
+        /* Look for a match */
+        if (count($aInCommomVersions) > 0)
+        {
+            $sProtocolVersion = $aInCommomVersions[0];
+        }
+        else
+        {
+            /* Close the connection if none is supported and include the accepted versions
+            * in the message so the client can retry with on of those. */
+            $this -> write('HTTP/1.1 426 Upgrade Required' . "\r\nSec-WebSocket-Version: " .
+                            implode(', ', $this -> m_aAcceptedVersions) . "\r\n\r\n");
             $this -> close(1002);
+            
             return false;
         }
         
