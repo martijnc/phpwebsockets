@@ -251,7 +251,7 @@ class WebSocketConnection extends Socket
             /* So we can parse the handshake from the client */
             if ($this -> parseHandshake()) {
                 
-                /* And when it was succesfull raise the onHandshaeRecieved event */
+                /* And when it was succesfull raise the onHandshakeRecieved event */
                 $this -> onHandshakeRecieved();
                 
                 /* When the handshake from the client was parsed succesfully (and was valid) we
