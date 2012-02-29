@@ -1,7 +1,7 @@
 PHP WebSockets
 ==============
 PHP WebSockets is a PHP library that implements the latest version of
-the WebSockets protocol. The [WebSockets protocol](http://tools.ietf.org/html/draft-ietf-hybi-thewebsocketprotocol-10) is currently being
+the WebSockets protocol. The [WebSockets protocol](http://www.rfc-editor.org/rfc/rfc6455.txt) (RFC6455) is currently being
 standardized by the IETF. With WebSockets, a client (e.g.: a browser) and
 a server can set up a two-way communication channel with little overhead
 compared to a XMLHttpRequest or long polling.
@@ -19,10 +19,6 @@ interface and subscribe to (or observe) a `WebSocketServer` instance. If you wan
 observer or subscribe to events that accur on the incomming `WebSocketConnections` too,
 you should implement the `ConnectionObserver` interface too and subscribe to the
 incomming connections in the `ServerObserver :: onNewConnection()` method.
-
-Todo's
-------
-The todo's are listed in the TODO file.
 
 License
 -------
